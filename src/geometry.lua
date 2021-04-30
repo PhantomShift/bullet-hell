@@ -1,5 +1,4 @@
 local Vector2 = require "Vector2"
-local Vector2 = require "Vector2"
 
 local Max, Min = math.max, math.min
 local function clamp(n, min, max)
