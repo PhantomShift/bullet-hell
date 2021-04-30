@@ -1,4 +1,4 @@
-love.window.setMode(350, 800 --[[, {vsync=false}]]) -- vsync = false removes fps limiter
+love.window.setMode(350, 800, {vsync=false})
 love.window.setTitle(":MatsuriDerp:")
 
 local player = require "player"
@@ -188,6 +188,9 @@ function love.load()
     keyboard = love.keyboard
 
     love.graphics.setBackgroundColor(1,1,1)
+
+    hz = 1/60
+    timer = 0
 end
 
 function love.keypressed(key)
@@ -203,6 +206,13 @@ local speed = 200
 function love.update(elapsedTime)
     if not ACTIVE then return end
     if PAUSED then return end
+    timer = timer + elapsedTime
+    if timer >= hz then
+        timer = timer % hz
+        elapsedTime = hz
+    else
+        return
+    end
     taskscheduler.update(elapsedTime)
     for physics_object, _ in pairs(physics_objects) do
         physics_object:update(elapsedTime)
