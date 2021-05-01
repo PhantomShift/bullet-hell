@@ -22,5 +22,24 @@ function path.Circle(center, rotSpeed, radius, start)
         return center + Vector2.fromAngle(start + rotSpeed * t, radius)
     end
 end
+function path.Linear(speed, ...)
+    local positions = {...}
+    assert(#positions > 1, "Must provide at least two positions")
+    local track = 1
+    local current, goal = positions[1], positions[2]
+    local timeToComplete= current:distanceTo(goal) / speed
+    local lifetime = 0
+    return function(t)
+        local c, g = current, goal
+        lifetime = lifetime + t
+        t = lifetime / timeToComplete
+        if t > 1 and track < #positions then
+            track = track + 1
+            current, goal = positions[track], positions[track+1]
+            timeToComplete = goal and current:distanceTo(goal) or nil
+        end
+        return c:Lerp(g, t), timeToComplete
+    end
+end
 
 return path
