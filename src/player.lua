@@ -9,8 +9,6 @@ function math.clamp(n, min, max)
 end
 
 local player = {
-    --pos_x = love.graphics.getWidth()/2,
-    --pos_y = love.graphics.getHeight()/2,
     pos = Vector2.new(love.graphics.getWidth()/2, love.graphics.getHeight()/2),
     image = love.graphics.newImage("assets/calli.png"),
     bullets = {},
@@ -42,16 +40,11 @@ function player.draw()
 end
 
 function player:move(dx, dy)
-    -- self.pos_x = player.pos_x + dx
-    -- self.pos_y = player.pos_y + dy
-    -- self.pos_x = math.min(self.pos_x, X_MAX - self.offset_x)
-    -- self.pos_x = math.max(self.pos_x, 0 + self.offset_x)
-    -- self.pos_y = math.min(self.pos_y, Y_MAX - self.offset_y)
-    -- self.pos_y = math.max(self.pos_y, 0 + self.offset_y)
     self.pos.x = math.clamp(player.pos.x + dx, -self.size.x / 2, X_MAX - self.size.x / 2)
     self.pos.y = math.clamp(player.pos.y + dy, -self.size.y / 2, Y_MAX - self.size.y / 2)
 end
 
+local zero = Vector2.new()
 local bullet_mt = {
     update = function(self, elapsedTime, enemy)
         self.pos_y = self.pos_y - self.speed * elapsedTime
@@ -60,11 +53,9 @@ local bullet_mt = {
             player.bullets[self] = nil
         end
         if enemy then
-            local enemy_size = Vector2.new(enemy.image:getWidth() / 2, enemy.image:getHeight() / 2)
-            local enemy_position = Vector2.new(enemy.pos_x, enemy.pos_y)
-            if geometry.CircleVsRectangle(geometry.Shapes.Circle.new(self.pos_x, self.pos_y, 16), enemy:getHitbox()) ~= Vector2.new() then
+            if geometry.CircleVsRectangle(geometry.Shapes.Circle.new(self.pos_x, self.pos_y, 16), enemy:getHitbox()) ~= zero then
                 enemy.health = enemy.health - 1
-                print(enemy.health)
+                --print(enemy.health)
             end
         end
     end,
