@@ -186,8 +186,9 @@ function love.load()
     end
 
     keyboard = love.keyboard
-
     love.graphics.setBackgroundColor(1,1,1)
+
+    love.audio.play(love.audio.newSource("assets/crystalized river.mp3", "static"))
 
     hz = 1/60
     timer = 0
