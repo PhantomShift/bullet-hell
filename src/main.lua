@@ -60,16 +60,6 @@ function love.load()
                 self.direction = self.direction * -1
             end
             --print(self.mode)
-            if self.mode == 1 and math.random(5) > 3 then
-                local p = self:center()
-                create_projectile(p.x, p.y)
-            elseif self.mode == 3 and math.random(5) > 3 then
-                local p = self:center()
-                projectile.weakHomingCircle(p, Vector2.new(0, 50))
-            elseif self.mode == 5 and math.random(50) == 50 then
-                local target = player.center()
-                aimedFireLaser(target, 1, {reflections = 4})
-            end
             -- if math.random(150) == 150 then
             --     print("fired a laser")
             --     --projectile.laser(Vector2.new(self.pos_x, self.pos_y), Vector2.new(1, 0):Rotate(math.random(0, 360), true), {reflections = 4})
@@ -82,6 +72,18 @@ function love.load()
             -- end
             if self.health <= 0 then
                 GameWon:Fire()
+            end
+        end,
+        step = function(self)
+            if self.mode == 1 and math.random(5) > 3 then
+                local p = self:center()
+                create_projectile(p.x, p.y)
+            elseif self.mode == 3 and math.random(5) > 3 then
+                local p = self:center()
+                projectile.weakHomingCircle(p, Vector2.new(0, 50))
+            elseif self.mode == 5 and math.random(50) == 50 then
+                local target = player.center()
+                aimedFireLaser(target, 1, {reflections = 4})
             end
         end,
         health = 1000,
@@ -184,9 +186,7 @@ function love.load()
 
     love.audio.setVolume(0.25)
     love.audio.play(love.audio.newSource("assets/crystalized river.mp3", "static"))
-
-    hz = 1/60
-    timer = 0
+    
 end
 
 function love.keypressed(key)
@@ -202,14 +202,8 @@ local speed = 200
 function love.update(elapsedTime)
     if not ACTIVE then return end
     if PAUSED then return end
-    timer = timer + elapsedTime
-    if timer >= hz then
-        timer = timer % hz
-        elapsedTime = hz
-    else
-        return
-    end
     taskscheduler.update(elapsedTime)
+
     for physics_object, _ in pairs(physics_objects) do
         physics_object:update(elapsedTime)
     end

@@ -3,6 +3,8 @@ Y_MAX = love.graphics.getHeight()
 
 local Vector2 = require "Vector2"
 local geometry = require "geometry"
+local taskscheduler = require "taskscheduler"
+local enemy = require "enemy"
 
 function math.clamp(n, min, max)
     return math.max(min, math.min(n, max))
@@ -46,12 +48,14 @@ end
 
 local zero = Vector2.new()
 local bullet_mt = {
-    update = function(self, elapsedTime, enemy)
+    update = function(self, elapsedTime)
         self.pos_y = self.pos_y - self.speed * elapsedTime
         self.rotation = (self.rotation + 1000 * elapsedTime) % 360
         if self.pos_y < 0 - 16 then
             player.bullets[self] = nil
         end
+    end,
+    step = function(self, enemy)
         if enemy then
             if geometry.CircleVsRectangle(geometry.Shapes.Circle.new(self.pos_x, self.pos_y, 16), enemy:getHitbox()) ~= zero then
                 enemy.health = enemy.health - 1
@@ -77,6 +81,7 @@ function player.fire_bullet(pos_x, pos_y, speed)
     local bullet = {pos_x = pos_x, pos_y = pos_y, speed = speed, rotation = 270}
     setmetatable(bullet, bullet_mt)
     player.bullets[bullet] = true
+    taskscheduler.Stepped:Connect(function() bullet:step(next(enemy.__enemy_list)) end)
     return bullet
 end
 
