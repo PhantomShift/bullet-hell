@@ -110,7 +110,7 @@ local GravityBoundProjectile = {
         love.graphics.setColor(r,g,b,a)
     end,
     update = function(self, elapsedTime)
-        self.vel.Y = self.vel.Y - GRAVITY * elapsedTime
+        self.vel = Vector2.new(self.vel.x, self.vel.Y - GRAVITY * elapsedTime)
         self.pos = self.pos + self.vel * elapsedTime
         if self.pos.y > Y_MAX then
             projectile.ProjectileList[self] = false

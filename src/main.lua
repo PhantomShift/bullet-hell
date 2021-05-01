@@ -56,7 +56,7 @@ function love.load()
         direction = 1,
         update = function(self, elapsedTime)
             --x = self.pos_x
-            self.pos.x = self.pos.x + self.direction * 100 * elapsedTime
+            self.pos = Vector2.new(self.pos.x + self.direction * 100 * elapsedTime, self.pos.y)
             if self.pos.x < 0 or self.pos.x + self.size.x > X_MAX then
                 self.direction = self.direction * -1
             end

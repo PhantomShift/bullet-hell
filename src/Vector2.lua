@@ -32,16 +32,16 @@ end
 -- returned by custom_type(v)
 Vector2.__type = "Vector2"
 function Vector2:__newindex(key, value)
-    --error "Properties of Vector2s cannot be changed directly"
-    local self = self.__true
-    if type(key) == "string" and (string.lower(key) == "x" or string.lower(key) == "y") then
-        rawset(self, string.upper(key), value)
-    else
-        error "Properties other than X or Y of Vector2s cannot be changed directly"
-    end
-    local x, y = (self.X), self.Y
-    rawset(self, "x", x)
-    rawset(self, "y", y)
+    error "Properties of Vector2s cannot be changed directly"
+    -- local self = self.__true
+    -- if type(key) == "string" and (string.lower(key) == "x" or string.lower(key) == "y") then
+    --     rawset(self, string.upper(key), value)
+    -- else
+    --     error "Properties other than X or Y of Vector2s cannot be changed directly"
+    -- end
+    -- local x, y = (self.X), self.Y
+    -- rawset(self, "x", x)
+    -- rawset(self, "y", y)
     --rawset(self, "Magnitude", math.sqrt(x * x + y * y))
     --rawset(self, "magnitude", self.Magnitude)
     -- if self.Magnitude > 0 then

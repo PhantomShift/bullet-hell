@@ -42,8 +42,10 @@ function player.draw()
 end
 
 function player:move(dx, dy)
-    self.pos.x = math.clamp(player.pos.x + dx, -self.size.x / 2, X_MAX - self.size.x / 2)
-    self.pos.y = math.clamp(player.pos.y + dy, -self.size.y / 2, Y_MAX - self.size.y / 2)
+    self.pos = Vector2.new(
+        math.clamp(player.pos.x + dx, -self.size.x / 2, X_MAX - self.size.x / 2),
+        math.clamp(player.pos.y + dy, -self.size.y / 2, Y_MAX - self.size.y / 2)
+    )
 end
 
 local zero = Vector2.new()
