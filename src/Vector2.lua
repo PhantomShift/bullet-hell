@@ -140,5 +140,15 @@ function Vector2:Project(other)
     --return self.Magnitude * math.cos(self:angleBetween(other)) * other
     return self:Dot(other.Unit) * other.Unit
 end
+-- returns Vector2 of interpolation between self and v with weight a
+function Vector2:Lerp(v, a)
+    local a = math.max(0, math.min(a, 1))
+    if a == 0 then
+        return Vector2.new(self.x, self.y)
+    elseif a == 1 then
+        return Vector2.new(v.x, v.y)
+    end
+    return self * (1 - a) + v * a
+end
 
 return Vector2
