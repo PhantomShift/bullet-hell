@@ -21,6 +21,7 @@ local enemy = {
         self.pos_x = self.pos_x + 50 * math.random() * math.random(-1,1) * elapsedTime
         self.pos_y = self.pos_y + 50 * math.random() * math.random(-1,1) * elapsedTime
     end,
+    step = function() end, -- placeholder
     draw = function(self)
         if not self.__enemy_list[self] then return end
         --love.graphics.draw(drawable,x,y,r,sx,sy,ox,oy)
