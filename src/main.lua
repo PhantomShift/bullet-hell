@@ -14,13 +14,7 @@ table.unpack = unpack
 
 local GameEnded = BindableEvent.new()
 
-local function delayedExecute(delay, func, ...)
-    local t = {...}
-    local c = coroutine.wrap(function()
-        func(unpack(t))   
-    end)
-    taskscheduler.addTask(c, delay)
-end
+local delayedExecute = taskscheduler.delay
 
 local GameWon = BindableEvent.new()
 GameWon:Connect(function()
@@ -188,6 +182,7 @@ function love.load()
     keyboard = love.keyboard
     love.graphics.setBackgroundColor(1,1,1)
 
+    love.audio.setVolume(0.25)
     love.audio.play(love.audio.newSource("assets/crystalized river.mp3", "static"))
 
     hz = 1/60
