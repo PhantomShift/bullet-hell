@@ -4,7 +4,7 @@ local connection_mt = {
     end
 }
 connection_mt.__index = connection_mt
-connection_mt.__newindex = function(self, index) error("No propery "..tostring(index).." in Connection") end
+connection_mt.__newindex = function(self, index) error("No property "..tostring(index).." in Connection") end
 
 -- Custom event management class; connections are run in a separate thread
 local BindableEvent = {
