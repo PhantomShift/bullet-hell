@@ -42,6 +42,7 @@ function love.load()
     ACTIVE = true
     local regular_font = love.graphics.getFont()
     GAME_OVER = love.graphics.newText(regular_font, "GAME OVER!")
+    PAUSED_TEXT = love.graphics.newText(regular_font, "PAUSED")
 
     function clear_list(list)
         for key, _ in pairs(list) do
@@ -148,6 +149,15 @@ function love.keypressed(key)
     end
 end
 
+function love.focus(f)
+    if f then
+        PAUSED = false
+    elseif not f then
+        PAUSED = true
+    end
+end
+
+
 -- loop
 local speed = 200
 function love.update(elapsedTime)
@@ -236,6 +246,13 @@ function love.draw()
     love.graphics.setColor(1,0,0)
     love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth() * percent, 20)
     
+    if PAUSED then
+        love.graphics.setColor(0,0,0, 0.5)
+        love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.draw(PAUSED_TEXT, X_MAX / 2, Y_MAX / 2, 0, 2, 2, PAUSED_TEXT:getWidth()/2, PAUSED_TEXT:getHeight()/2)
+    end
+
     love.graphics.setColor(r,g,b,a)
 
 
