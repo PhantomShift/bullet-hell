@@ -20,7 +20,7 @@ local geometry = {}
 -- Checks for collision between a given circle and rectangle; returns offset needed to make circle no longer overlap with the rectangle. offset is Vector2 {0, 0} if not overlapping
 function geometry.CircleVsRectangle(circle, rectangle)
     local NearestPoint = Vector2.new(
-        clamp(circle.Position.X, rectangle.Position.X, rectangle.Width),
+        clamp(circle.Position.X, rectangle.Position.X, rectangle.Position.X + rectangle.Width),
         clamp(circle.Position.Y, rectangle.Position.Y, rectangle.Position.Y + rectangle.Height)
     )
     local N = NearestPoint - circle.Position
@@ -115,7 +115,11 @@ function geometry.CheckCircleVsCircle(circle1, circle2)
     return circle1.Position:distanceTo(circle2.Position) < circle1.Radius + circle2.Radius
 end
 
-local Circle = {}
+local Circle = {
+    __tostring = function(self)
+        return "Shake: Circle, Position: "..tostring(self.Position)..", Radius: "..self.Radius
+    end
+}
 Circle.__index = Circle
 function Circle.new(posX, posY, radius)
     local circle = {
@@ -127,7 +131,10 @@ function Circle.new(posX, posY, radius)
 end
 
 local Rectangle = {
-    Size = function(self) return Vector2.new(self.Width, self.Height) end
+    Size = function(self) return Vector2.new(self.Width, self.Height) end,
+    __tostring = function(self)
+        return "Shape: Rectangle, Position: "..tostring(self.Position)..", Size: "..tostring(self:Size())
+    end
 }
 Rectangle.__index = Rectangle
 function Rectangle.new(posX, posY, width, height)
