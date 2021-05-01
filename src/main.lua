@@ -92,8 +92,8 @@ function love.load()
             elseif self.mode == 7 and math.random(5) > 3 then
                 for b = 1, 3 do
                     delayedExecute(b, function()
-                        for i = 0, 360, 20 do
-                            projectile.spiralCircle(self:center(), 1.5, 70, math.rad(i), 10)
+                        for i = 0, 360, 40 do
+                            projectile.spiralCircle(self:center(), 1.5, 100, math.rad(i), 10)
                         end
                     end)
                 end
