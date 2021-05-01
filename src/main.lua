@@ -1,3 +1,4 @@
+local path = require "src.path"
 love.window.setMode(350, 800, {vsync=false})
 love.window.setTitle(":MatsuriDerp:")
 
@@ -58,11 +59,21 @@ function love.load()
     random_enemy = enemy:new{
         pos = Vector2.new(love.graphics.getWidth()/2, 50),
         direction = 1,
+        boundaries = {min = Vector2.new(30, 20), max = Vector2.new(love.graphics.getWidth()-60, 170)},
         update = function(self, elapsedTime)
-            self.pos = Vector2.new(self.pos.x + self.direction * 100 * elapsedTime, self.pos.y)
-            if self.pos.x < 0 or self.pos.x + self.size.x > X_MAX then
-                self.direction = self.direction * -1
+            local resolver = self.resolver
+            if not resolver then
+                local goal = Vector2.new(math.random(self.boundaries.min.x, self.boundaries.max.x), math.random(self.boundaries.min.y, self.boundaries.max.y))
+                resolver = path.Linear(math.random(40, 80), self.pos, goal)
+                self.resolver = resolver
             end
+            local p, b = resolver(elapsedTime)
+            self.pos = p
+            if not b then self.resolver = nil end
+            -- self.pos = Vector2.new(self.pos.x + self.direction * 100 * elapsedTime, self.pos.y)
+            -- if self.pos.x < 0 or self.pos.x + self.size.x > X_MAX then
+            --     self.direction = self.direction * -1
+            -- end
             if self.health <= 0 then
                 GameWon:Fire()
             end
