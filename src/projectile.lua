@@ -37,7 +37,6 @@ function projectile.laser(start, direction, flags)
             local str, stp = segment.start, segment.stop
             love.graphics.line(str.x,str.y,stp.x,stp.y)
             love.graphics.circle("line", str.x, str.y, 10)
-            love.graphics.circle("line", stp.x, stp.y, 10)
         end
         love.graphics.setColor(r,g,b,a)
     end
