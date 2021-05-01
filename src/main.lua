@@ -194,6 +194,8 @@ function love.keypressed(key)
         love.event.quit()
     elseif key == "x" then
         PAUSED = not PAUSED
+    elseif key == "r" and keyboard.isDown("lctrl") then
+        love.event.quit("restart")
     end
 end
 
