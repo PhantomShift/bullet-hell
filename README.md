@@ -10,3 +10,5 @@ If you'd like to play, retrieve love (it is available in Ubuntu's package manage
 - Movement: WASD
 - Precise movement: left shift (Also makes hitbox smaller)
 - Fire: spacebar or LMB
+- Restart: left control + R
+- Close: ESC
