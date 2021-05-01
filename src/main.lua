@@ -39,6 +39,10 @@ function love.load()
     X_MAX = love.graphics.getWidth()
     
     PAUSED = false
+    function togglePause()
+        PAUSED = not PAUSED
+        taskscheduler.Paused = PAUSED
+    end
     ACTIVE = true
     local regular_font = love.graphics.getFont()
     GAME_OVER = love.graphics.newText(regular_font, "GAME OVER!")
@@ -153,18 +157,17 @@ function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
     elseif key == "x" then
-        PAUSED = not PAUSED
-        taskscheduler.Paused = PAUSED
+        togglePause()
     elseif key == "r" and keyboard.isDown("lctrl") then
         love.event.quit("restart")
     end
 end
 
 function love.focus(f)
-    if f then
-        PAUSED = false
-    elseif not f then
-        PAUSED = true
+    if f and PAUSED then
+        togglePause()
+    elseif not f and not PAUSED then
+        togglePause()
     end
 end
 
