@@ -1,6 +1,6 @@
 local BindableEvent = require "BindableEvent"
 local coroutine = require "coroutine"
-local tick = os.time
+local tick = os.clock
 
 local frametime = 1/60
 local __await = {}
@@ -15,10 +15,10 @@ local main_thread = coroutine.create(function()
         local dt = currentTime - __time
         if dt > frametime then
             taskscheduler.Stepped:Fire(dt)
+            __time = currentTime
         end
-        __time = currentTime
         for c, delay in pairs(__await) do
-            if __time > delay then
+            if currentTime > delay then
                 local s, e = coroutine.resume(c)
                 if not s then error(e) end
                 __await[c] = nil
@@ -28,7 +28,7 @@ local main_thread = coroutine.create(function()
     end
 end)
 
-function taskscheduler.update(elapsedTime)
+function taskscheduler.update()
     local success, err = coroutine.resume(main_thread)
     if not success then
         error(table.concat({"Thread error from", tostring(main_thread), ":", err}))
