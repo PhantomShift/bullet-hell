@@ -9,14 +9,19 @@ connection_mt.__newindex = function(self, index) error("No property "..tostring(
 -- Custom event management class; connections are run in a separate thread
 local BindableEvent = {
     Connect = function(self, func)
-        local connection = {Owner = self, Coroutine = coroutine.wrap(func)}
+        local connection = {
+            Owner = self, 
+            Execute = function(...)
+                coroutine.wrap(func)(...)
+            end
+        }
         setmetatable(connection, connection_mt)
         self.__connections[connection] = true
         return connection
     end,
     Fire = function(self, ...)
         for connection, _ in pairs(self.__connections) do
-            connection.Coroutine(...)
+            connection.Execute(...)
         end
     end
 }
