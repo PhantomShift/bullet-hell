@@ -1,6 +1,7 @@
 local Vector2 = require "Vector2"
 local geometry = require "geometry"
 local player = require "player"
+local path = require "path"
 local Shapes = geometry.Shapes
 
 local projectile = {}
@@ -131,6 +132,22 @@ function projectile.gravityBoundCircle(posX, posY, velX, velY, radius)
     setmetatable(c, GravityBoundProjectile)
     projectile.ProjectileList[c] = true
     return c
+end
+
+function projectile.spiralCircle(pos, rotSpeed, expSpeed, startAngle, radius)
+    local t = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius = radius or 10}
+    local resolve = path.Spiral(pos, rotSpeed, expSpeed, startAngle)
+    function t:update(elapsedTime)
+        self.lifetime = self.lifetime + elapsedTime
+        local p, r = resolve(self.lifetime)
+        if r > love.graphics.getHeight() then
+            projectile.ProjectileList[t] = nil
+            return
+        end
+        self.pos = p
+    end
+    projectile.ProjectileList[t] = true
+    return t
 end
 
 return projectile
