@@ -85,11 +85,21 @@ function love.load()
             elseif self.mode == 5 and math.random(50) == 50 then
                 local target = player.center()
                 aimedFireLaser(target, 1, {reflections = 4})
+            elseif self.mode == 7 and math.random(5) > 3 then
+                for b = 1, 3 do
+                    delayedExecute(b, function()
+                        for i = 0, 360, 20 do
+                            projectile.spiralCircle(self:center(), 1.5, 70, math.rad(i), 10)
+                        end
+                    end)
+                end
+                self.mode = self.mode + 1
+                --projectile.spiralCircle(p, 1, 50, 10)
             end
         end,
         health = 1000,
         max_health = 1000,
-        mode = 1
+        mode = 6
     }
     function aimedFireLaser(targetPos, delay, reflections)
         local info = {
@@ -113,7 +123,7 @@ function love.load()
         end)
     end
     
-    local function some_loop() delayedExecute(2.5, function() random_enemy.mode = (random_enemy.mode + 1) % 6; some_loop() end) end
+    local function some_loop() delayedExecute(2.5, function() random_enemy.mode = (random_enemy.mode + 1) % 9; some_loop() end) end
     some_loop()
     local function execution_loop()
         delayedExecute(2.5, function()
@@ -144,6 +154,7 @@ function love.keypressed(key)
         love.event.quit()
     elseif key == "x" then
         PAUSED = not PAUSED
+        taskscheduler.Paused = PAUSED
     elseif key == "r" and keyboard.isDown("lctrl") then
         love.event.quit("restart")
     end
@@ -162,9 +173,8 @@ end
 local speed = 200
 function love.update(elapsedTime)
     if not ACTIVE then return end
-    if PAUSED then return end
     taskscheduler.update(elapsedTime)
-
+    if PAUSED then return end
     for physics_object, _ in pairs(physics_objects) do
         physics_object:update(elapsedTime)
     end

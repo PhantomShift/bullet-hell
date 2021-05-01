@@ -6,22 +6,30 @@ local frametime = 1/60
 local __await = {}
 local __time = tick()
 local taskscheduler = {
-    Stepped = BindableEvent.new()
+    Stepped = BindableEvent.new(),
+    Paused = false
 }
 
 local main_thread = coroutine.create(function()
     while true do
         local currentTime = tick()
         local dt = currentTime - __time
-        if dt > frametime then
-            taskscheduler.Stepped:Fire(dt)
+        if taskscheduler.Paused then
             __time = currentTime
-        end
-        for c, delay in pairs(__await) do
-            if currentTime > delay then
-                local s, e = coroutine.resume(c)
-                if not s then error(e) end
-                __await[c] = nil
+            for c, delay in pairs(__await) do
+                __await[c] = delay + dt
+            end
+        else
+            if dt > frametime then
+                taskscheduler.Stepped:Fire(dt)
+                __time = currentTime
+            end
+            for c, delay in pairs(__await) do
+                if currentTime > delay then
+                    local s, e = coroutine.resume(c)
+                    if not s then error(e) end
+                    __await[c] = nil
+                end
             end
         end
         coroutine.yield()
