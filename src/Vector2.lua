@@ -150,5 +150,6 @@ function Vector2:Lerp(v, a)
     end
     return self * (1 - a) + v * a
 end
+Vector2.ZERO = Vector2.new()
 
 return Vector2
