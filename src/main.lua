@@ -77,7 +77,7 @@ function love.load()
         step = function(self)
             if self.mode == 1 and math.random(5) > 3 then
                 local p = self:center()
-                create_projectile(p.x, p.y)
+                projectile.gravityBoundCircle(p.x, p.y)
             elseif self.mode == 3 and math.random(5) > 3 then
                 local p = self:center()
                 projectile.weakHomingCircle(p, Vector2.new(0, 50))
@@ -129,57 +129,6 @@ function love.load()
         end)
     end
     execution_loop()
-
-    function destroy_physics_object(object)
-        if not physics_objects[object] then
-            error("Not a physics object or already deleted")
-        end
-        physics_objects[object] = nil
-        for key, value in pairs(object) do
-            object[key] = nil
-        end
-    end
-    
-    local function distance_from_player(posx,posy)
-        --local playerx, playery = player.pos_x, player.pos_y
-        --return math.sqrt((playerx - posx) * (playerx - posx) + (playery - posy) * (playery - posy))
-        return player.center():distanceTo(Vector2.new(posx, posy))
-    end
-    proj_meta = {
-        draw = function(self)
-            if not physics_objects[self] then return end
-            local r,g,b,a = love.graphics.getColor()
-            love.graphics.setColor(0,0,0)
-            love.graphics.circle("fill",self.posX,self.posY,10)
-            love.graphics.setColor(r,g,b,a)
-        end,
-        update = function(self, elapsedTime)
-            self.velY = self.velY - GRAVITY * elapsedTime
-            self.posX = self.posX + self.velX * elapsedTime
-            self.posY = self.posY + self.velY * elapsedTime
-            if self.posY > Y_MAX then
-                destroy_physics_object(self)
-                return
-            end
-            --print(self.posX, self.posY)
-            if distance_from_player(self.posX, self.posY) < 50 and geometry.CheckCircleVsCircle(player.getHitbox(), Shapes.Circle.new(self.posX, self.posY, 10)) then
-                ACTIVE = false
-                GameEnded:Fire("GAME OVER")
-            end
-        end
-    }
-    proj_meta.__index = proj_meta
-    function create_projectile(posX, posY)
-        local projectile = {
-            posX = posX,
-            posY = posY,
-            velX = math.random(-50,50),
-            velY = math.random(0,50)
-        }
-        setmetatable(projectile, proj_meta)
-        physics_objects[projectile] = true
-        return projectile
-    end
 
     keyboard = love.keyboard
     love.graphics.setBackgroundColor(1,1,1)

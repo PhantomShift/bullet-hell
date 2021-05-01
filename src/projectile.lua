@@ -96,4 +96,41 @@ function projectile.weakHomingCircle(pos, vel, radius, strength)
 
 end
 
+local function distance_from_player(posx,posy)
+    --local playerx, playery = player.pos_x, player.pos_y
+    --return math.sqrt((playerx - posx) * (playerx - posx) + (playery - posy) * (playery - posy))
+    return player.center():distanceTo(Vector2.new(posx, posy))
+end
+local GravityBoundProjectile = {
+    draw = function(self)
+        if not projectile.ProjectileList[self] then return end
+        local r,g,b,a = love.graphics.getColor()
+        love.graphics.setColor(0,0,0)
+        love.graphics.circle("fill",self.pos.x,self.pos.y,self.radius)
+        love.graphics.setColor(r,g,b,a)
+    end,
+    update = function(self, elapsedTime)
+        self.vel.Y = self.vel.Y - GRAVITY * elapsedTime
+        self.pos = self.pos + self.vel * elapsedTime
+        if self.pos.y > Y_MAX then
+            projectile.ProjectileList[self] = false
+            return
+        end
+    end,
+    hits = function(self, hitbox)
+        return distance_from_player(self.pos.x, self.pos.y) < 50 and geometry.CheckCircleVsCircle(hitbox, Shapes.Circle.new(self.pos.x, self.pos.y, self.radius))
+    end
+}
+GravityBoundProjectile.__index = GravityBoundProjectile
+function projectile.gravityBoundCircle(posX, posY, velX, velY, radius)
+    local c = {
+        pos = Vector2.new(posX, posY),
+        vel = Vector2.new(velX or math.random(-50, 50), velY or math.random(0, 50)),
+        radius = radius or 10
+    }
+    setmetatable(c, GravityBoundProjectile)
+    projectile.ProjectileList[c] = true
+    return c
+end
+
 return projectile
