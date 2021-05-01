@@ -100,14 +100,18 @@ function geometry.CheckRayVsCircle(ray_start, ray_end, circle)
     if ray_start:distanceTo(circle.Position) < circle.Radius or ray_end:distanceTo(circle.Position) < circle.Radius then
         return true
     end
-    local ray = ray_start - ray_end--ray_end - ray_start
+    local ray = ray_end - ray_start
     local to_circle = circle.Position - ray_start
+
+    -- Check to see if the direction of the ray makes it physically impossible to collide
+    if sign(to_circle.x) ~= sign(ray.x) or sign(to_circle.y) ~= sign(ray.y) then return false end
+    
     local projection = to_circle:Project(ray) --ray:Project(circle.Position)
-    local r,g,b,a = love.graphics.getColor()
-    love.graphics.setColor(0,0,0)
-    love.graphics.circle("fill", ray_start.x + projection.x, ray_start.y + projection.y,50)
-    --print("ray vs circle evaluated")
-    love.graphics.setColor(r,g,b,a)
+    -- local r,g,b,a = love.graphics.getColor()
+    -- love.graphics.setColor(0,0,0)
+    -- love.graphics.circle("fill", ray_start.x + projection.x, ray_start.y + projection.y,50)
+    -- --print("ray vs circle evaluated")
+    -- love.graphics.setColor(r,g,b,a)
     return projection.Magnitude < ray.Magnitude and (ray_start + projection):distanceTo(circle.Position) < circle.Radius
 end
 -- Naive check if two circles are overlapping; only returns boolean
