@@ -59,22 +59,10 @@ function love.load()
         pos = Vector2.new(love.graphics.getWidth()/2, 50),
         direction = 1,
         update = function(self, elapsedTime)
-            --x = self.pos_x
             self.pos = Vector2.new(self.pos.x + self.direction * 100 * elapsedTime, self.pos.y)
             if self.pos.x < 0 or self.pos.x + self.size.x > X_MAX then
                 self.direction = self.direction * -1
             end
-            --print(self.mode)
-            -- if math.random(150) == 150 then
-            --     print("fired a laser")
-            --     --projectile.laser(Vector2.new(self.pos_x, self.pos_y), Vector2.new(1, 0):Rotate(math.random(0, 360), true), {reflections = 4})
-            --     local target = player.center()
-            --     -- delayedExecute(1, function()
-            --     --     local s = random_enemy:center()
-            --     --     projectile.laser(s, target - s, {reflections = 4})
-            --     -- end)
-            --     aimedFireLaser(target, 1, {reflections = 4})
-            -- end
             if self.health <= 0 then
                 GameWon:Fire()
             end
@@ -131,14 +119,7 @@ function love.load()
     some_loop()
     local function execution_loop()
         delayedExecute(2.5, function()
-            --local s = Vector2.new(random_enemy.pos_x, random_enemy.pos_y)
             local target = player.center()
-            --projectile.laser(Vector2.new(random_enemy.pos_x, random_enemy.pos_y), player.center() - s)
-            -- delayedExecute(0.5, function()
-            --     local s = random_enemy:center()
-            --     projectile.laser(s, target - s)
-            --     execution_loop()
-            -- end)
             aimedFireLaser(target, 0.5)
             execution_loop()
         end)
