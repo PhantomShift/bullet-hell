@@ -98,6 +98,15 @@ function love.load()
                 end
                 self.mode = self.mode + 1
                 --projectile.spiralCircle(p, 1, 50, 10)
+            elseif self.mode == 10 then
+                for b = 0, 3 do
+                    delayedExecute(b, function()
+                        for i = 0, 360, 60 do
+                            projectile.delayedChase(self:center(), player, 3, Vector2.fromAngle(i, 150, true), 500, 11.5)
+                        end
+                    end)
+                end
+                self.mode = self.mode + 1
             end
         end,
         health = 1000,
@@ -126,7 +135,7 @@ function love.load()
         end)
     end
     
-    local function some_loop() delayedExecute(2.5, function() random_enemy.mode = (random_enemy.mode + 1) % 9; some_loop() end) end
+    local function some_loop() delayedExecute(2.5, function() random_enemy.mode = (random_enemy.mode + 1) % 12; some_loop() end) end
     some_loop()
     local function execution_loop()
         delayedExecute(2.5, function()
