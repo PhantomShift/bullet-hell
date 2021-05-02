@@ -1,4 +1,3 @@
-local path = require "src.path"
 love.window.setMode(350, 800, {vsync=false})
 love.window.setTitle(":MatsuriDerp:")
 
@@ -11,6 +10,8 @@ local Shapes = geometry.Shapes
 local projectile = require "projectile"
 local taskscheduler = require "taskscheduler"
 local BindableEvent = require "BindableEvent"
+local path = require "path"
+
 table.unpack = unpack
 
 local GameEnded = BindableEvent.new()
