@@ -1,5 +1,6 @@
 local Vector2 = require "Vector2"
 local geometry = require "geometry"
+local taskscheduler = require "taskscheduler"
 local player = require "player"
 local path = require "path"
 local Shapes = geometry.Shapes
@@ -147,6 +148,25 @@ function projectile.spiralCircle(pos, rotSpeed, expSpeed, startAngle, radius)
     end
     projectile.ProjectileList[t] = true
     return t
+end
+
+function projectile.delayedChase(pos, target, delay, initialVelocity, chaseSpeed, radius)
+    local chase = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius =  radius or 10, vel = initialVelocity}
+    function chase:update(elapsedTime)
+        self.vel = self.vel:Lerp(Vector2.ZERO, elapsedTime)
+        self.pos = self.pos + self.vel * elapsedTime
+    end
+    taskscheduler.delay(delay, function()
+        chase.vel = (target.pos - chase.pos).Unit * chaseSpeed
+        chase.update = function(self, elapsedTime)
+            self.pos = self.pos + self.vel * elapsedTime
+            if self.pos.x < 0 or self.pos.y < 0 or self.pos.x > love.graphics.getWidth() or self.pos.y > love.graphics.getHeight() then
+                projectile.ProjectileList[self] = false
+            end
+        end
+    end)
+    projectile.ProjectileList[chase] = true
+    return chase
 end
 
 return projectile
