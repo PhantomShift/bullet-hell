@@ -12,7 +12,7 @@ end
 
 local player = {
     pos = Vector2.new(love.graphics.getWidth()/2, love.graphics.getHeight()/2),
-    image = love.graphics.newImage("assets/calli.png"),
+    image = love.graphics.newImage("assets/calli_sprite.png"),
     bullets = {},
     can_fire = true,
     fire_cd = 0,
@@ -34,7 +34,7 @@ function player.draw()
         player.image,
         player.pos.x,
         player.pos.y,
-        0, 1, 1--,
+        0, 0.8, 0.8, -4, -6--,
         --player.size.x / 2,
         --player.size.y / 2
     )

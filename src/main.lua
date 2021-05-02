@@ -151,7 +151,7 @@ function love.load()
     love.graphics.setBackgroundColor(1,1,1)
 
     love.audio.setVolume(0.25)
-    love.audio.play(love.audio.newSource("assets/crystalized river.mp3", "static"))
+    love.audio.play(love.audio.newSource("assets/fck It..mp3", "static"))
     
 end
 
