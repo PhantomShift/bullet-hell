@@ -45,7 +45,7 @@ function geometry.RayVsRect(ray_origin, ray_dir, target, ignore_negative)
     local t_far = (target.Position + target:Size() - ray_origin) / ray_dir
 
     if (t_near.x > t_far.x) then t_near, t_far =  Vector2.new(t_far.x, t_near.y), Vector2.new(t_near.x, t_far.y) end
-    if (t_near.x > t_far.x) then t_near, t_far =  Vector2.new(t_near.x, t_far.y), Vector2.new(t_far.x, t_near.y) end
+    if (t_near.y > t_far.y) then t_near, t_far =  Vector2.new(t_near.x, t_far.y), Vector2.new(t_far.x, t_near.y) end
 
     if not ignore_negative then
         if t_near.x > t_far.y or t_near.y > t_far.x then return false end
