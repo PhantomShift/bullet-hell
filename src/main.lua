@@ -191,7 +191,7 @@ function love.update(elapsedTime)
     for p, _ in pairs(ProjectileList) do
         p:update(elapsedTime)
         if p:hits(player.getHitbox()) then
-            print("intersected hello???")
+            print("Projectile:", p)
             ACTIVE = false
             GameEnded:Fire("GAME OVER")
         end
