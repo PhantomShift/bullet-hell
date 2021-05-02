@@ -157,7 +157,7 @@ function projectile.delayedChase(pos, target, delay, initialVelocity, chaseSpeed
         self.pos = self.pos + self.vel * elapsedTime
     end
     taskscheduler.delay(delay, function()
-        chase.vel = (target.pos - chase.pos).Unit * chaseSpeed
+        chase.vel = (target:center() - chase.pos).Unit * chaseSpeed
         chase.update = function(self, elapsedTime)
             self.pos = self.pos + self.vel * elapsedTime
             if self.pos.x < 0 or self.pos.y < 0 or self.pos.x > love.graphics.getWidth() or self.pos.y > love.graphics.getHeight() then
