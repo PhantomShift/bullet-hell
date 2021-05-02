@@ -124,6 +124,7 @@ local GravityBoundProjectile = {
         end
     end,
     hits = function(self, hitbox)
+        if not projectile.ProjectileList[self] then return false end
         return distance_from_player(self.pos.x, self.pos.y) < 50 and geometry.CheckCircleVsCircle(hitbox, Shapes.Circle.new(self.pos.x, self.pos.y, self.radius))
     end
 }
@@ -165,6 +166,7 @@ function projectile.delayedChase(pos, target, delay, initialVelocity, chaseSpeed
     taskscheduler.delay(delay, function()
         chase.vel = (target:center() - chase.pos).Unit * chaseSpeed
         chase.update = function(self, elapsedTime)
+            if not projectile.ProjectileList[self] then return end
             self.pos = self.pos + self.vel * elapsedTime
             if self.pos.x < 0 or self.pos.y < 0 or self.pos.x > love.graphics.getWidth() or self.pos.y > love.graphics.getHeight() then
                 projectile.ProjectileList[self] = false
