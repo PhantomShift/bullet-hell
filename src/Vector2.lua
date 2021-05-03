@@ -13,43 +13,11 @@ end
 local Vector2 = {}
 -- metamethods
 
-function Vector2:__index(key)
-    if string.lower(key) == "magnitude" then
-        local x, y = self.__true.X, self.__true.Y
-        return math.sqrt(x * x + y * y)
-    elseif string.lower(key) == "unit" then
-        local m = self.Magnitude
-        if m > 0 then
-            return Vector2.new(self.__true.x / m, self.__true.y / m)
-        end
-        return self
-    end
-    if Vector2[key] then
-        return Vector2[key]
-    end
-    return self.__true[key]
-end
+Vector2.__index = Vector2
 -- returned by custom_type(v)
 Vector2.__type = "Vector2"
 function Vector2:__newindex(key, value)
     error "Properties of Vector2s cannot be changed directly"
-    -- local self = self.__true
-    -- if type(key) == "string" and (string.lower(key) == "x" or string.lower(key) == "y") then
-    --     rawset(self, string.upper(key), value)
-    -- else
-    --     error "Properties other than X or Y of Vector2s cannot be changed directly"
-    -- end
-    -- local x, y = (self.X), self.Y
-    -- rawset(self, "x", x)
-    -- rawset(self, "y", y)
-    --rawset(self, "Magnitude", math.sqrt(x * x + y * y))
-    --rawset(self, "magnitude", self.Magnitude)
-    -- if self.Magnitude > 0 then
-    --     rawset(self, "Unit", Vector2.new(x, y) / self.Magnitude)
-    -- else
-    --     rawset(self, "Unit", self)
-    -- end
-    -- rawset(self, "unit", self.Unit)
 end
 function Vector2:__eq(t)
     return custom_type(t) == "Vector2" and self.x == t.x and self.y == t.y
@@ -99,9 +67,8 @@ function Vector2.new(x, y)
         v.Unit = Vector2.new(x / v.Magnitude, y / v.Magnitude)
     end
     v.unit = v.Unit
-    local alias = {__true = v}
-    setmetatable(alias, Vector2)
-    return alias
+    setmetatable(v, Vector2)
+    return v
 end
 -- returns new Vector2 using angle and magnitude; optional Degrees if angle is in degrees instead of radians
 function Vector2.fromAngle(angle, magnitude, Degrees)
