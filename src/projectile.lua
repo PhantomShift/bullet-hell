@@ -66,6 +66,19 @@ function projectile.laser(start, direction, flags)
     return laser
 end
 
+local function drawGlowingCircle(x, y, radius, r, g, b)
+    local oldr, oldg, oldb, olda = love.graphics.getColor()
+    local n = 0
+    for i = radius + 1, radius - 4, -0.5 do
+        love.graphics.setColor(r, g, b, n)
+        love.graphics.circle("fill",x,y,i)
+        n = n + 0.1
+    end
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.circle("fill", x, y, radius - 4)
+    love.graphics.setColor(oldr, oldg, oldb, olda)
+end
+
 -- note that this is coded specifically for enemy projectiles
 local WeakHomingProjectiles = {
     __type = "Weaking Homing Projectile",
@@ -110,10 +123,11 @@ local GravityBoundProjectile = {
     __type = "Gravity Bound Projectile",
     draw = function(self)
         if not projectile.ProjectileList[self] then return end
-        local r,g,b,a = love.graphics.getColor()
-        love.graphics.setColor(0,0,0)
-        love.graphics.circle("fill",self.pos.x,self.pos.y,self.radius)
-        love.graphics.setColor(r,g,b,a)
+        -- local r,g,b,a = love.graphics.getColor()
+        -- love.graphics.setColor(0,0,0)
+        -- love.graphics.circle("fill",self.pos.x,self.pos.y,self.radius)
+        -- love.graphics.setColor(r,g,b,a)
+        drawGlowingCircle(self.pos.x, self.pos.y, self.radius, unpack(self.color))
     end,
     update = function(self, elapsedTime)
         self.vel = Vector2.new(self.vel.x, self.vel.Y - GRAVITY * elapsedTime)
@@ -133,7 +147,8 @@ function projectile.gravityBoundCircle(posX, posY, velX, velY, radius)
     local c = {
         pos = Vector2.new(posX, posY),
         vel = Vector2.new(velX or math.random(-50, 50), velY or math.random(0, 50)),
-        radius = radius or 10
+        radius = radius or 10,
+        color = {math.random(), math.random(), math.random()}
     }
     setmetatable(c, GravityBoundProjectile)
     projectile.ProjectileList[c] = true
@@ -141,7 +156,7 @@ function projectile.gravityBoundCircle(posX, posY, velX, velY, radius)
 end
 
 function projectile.spiralCircle(pos, rotSpeed, expSpeed, startAngle, radius)
-    local t = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius = radius or 10, __type = "Spiral"}
+    local t = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius = radius or 10, __type = "Spiral", color = {math.random(), math.random(), math.random()}}
     local resolve = path.Spiral(pos, rotSpeed, expSpeed, startAngle)
     function t:update(elapsedTime)
         self.lifetime = self.lifetime + elapsedTime
@@ -158,7 +173,7 @@ function projectile.spiralCircle(pos, rotSpeed, expSpeed, startAngle, radius)
 end
 
 function projectile.delayedChase(pos, target, delay, initialVelocity, chaseSpeed, radius)
-    local chase = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius =  radius or 10, vel = initialVelocity, __type = "Delayed Chase"}
+    local chase = {draw = GravityBoundProjectile.draw, hits = GravityBoundProjectile.hits, lifetime = 0, pos = pos, radius =  radius or 10, vel = initialVelocity, __type = "Delayed Chase", color = {math.random(), math.random(), math.random()}}
     function chase:update(elapsedTime)
         self.vel = self.vel:Lerp(Vector2.ZERO, elapsedTime)
         self.pos = self.pos + self.vel * elapsedTime
