@@ -12,4 +12,5 @@ If you'd like to play, retrieve love (it is available in Ubuntu's package manage
 - Precise movement: left shift (Also makes hitbox smaller)
 - Fire: spacebar or LMB
 - Restart: left control + R
+- Pause: X (note that if the window loses and gains focus, it will unpause)
 - Close: ESC
