@@ -6,6 +6,8 @@ local geometry = require "geometry"
 local taskscheduler = require "taskscheduler"
 local enemy = require "enemy"
 
+local main_thread = taskscheduler.schedulers.main
+
 function math.clamp(n, min, max)
     return math.max(min, math.min(n, max))
 end
@@ -83,7 +85,7 @@ function player.fire_bullet(pos_x, pos_y, speed)
     local bullet = {pos_x = pos_x, pos_y = pos_y, speed = speed, rotation = 270}
     setmetatable(bullet, bullet_mt)
     player.bullets[bullet] = true
-    taskscheduler.Stepped:Connect(function() bullet:step(next(enemy.__enemy_list)) end)
+    main_thread.Stepped:Connect(function() bullet:step(next(enemy.__enemy_list)) end)
     return bullet
 end
 

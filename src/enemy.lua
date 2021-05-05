@@ -1,6 +1,9 @@
 local Vector2 = require "Vector2"
 local geometry = require "geometry"
 local taskscheduler = require "taskscheduler"
+
+local main_thread = taskscheduler.schedulers.main
+
 X_MAX = love.graphics.getWidth()
 Y_MAX = love.graphics.getHeight()
 
@@ -50,7 +53,7 @@ function enemy:new(t)
     assert(t.pos, "enemy:new missing arguments")
     self.__index = self
     if t.step then
-        taskscheduler.Stepped:Connect(function() t:step() end)
+        main_thread.Stepped:Connect(function() t:step() end)
     end
     setmetatable(t, self)
     t.size = Vector2.new(t.image:getWidth()/2, t.image:getHeight()/2)

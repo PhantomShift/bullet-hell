@@ -163,7 +163,7 @@ function projectile.delayedChase(pos, target, delay, initialVelocity, chaseSpeed
         self.vel = self.vel:Lerp(Vector2.ZERO, elapsedTime)
         self.pos = self.pos + self.vel * elapsedTime
     end
-    taskscheduler.delay(delay, function()
+    taskscheduler.schedulers.main.delay(delay, function()
         chase.vel = (target:center() - chase.pos).Unit * chaseSpeed
         chase.update = function(self, elapsedTime)
             if not projectile.ProjectileList[self] then return end
