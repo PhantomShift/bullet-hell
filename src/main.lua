@@ -1,6 +1,6 @@
 love.window.setMode(350, 800, {vsync=false})
 love.window.setTitle(":MatsuriDerp:")
-
+local a
 local player = require "player"
 local enemy = require "enemy"
 local Vector2 = require "Vector2"
@@ -11,12 +11,16 @@ local projectile = require "projectile"
 local taskscheduler = require "taskscheduler"
 local BindableEvent = require "BindableEvent"
 local path = require "path"
+local Interface = require "Interface"
+local UserInput = require "UserInput"
 
 table.unpack = unpack
 
 local GameEnded = BindableEvent.new()
 
-local delayedExecute = taskscheduler.delay
+local main_thread = taskscheduler.schedulers.main
+
+local delayedExecute = main_thread.delay
 
 local GameWon = BindableEvent.new()
 GameWon:Connect(function()
@@ -176,9 +180,9 @@ end
 
 -- loop
 local speed = 200
-function love.update(elapsedTime)
+main_thread.Stepped:Connect(function(elapsedTime)
     if not ACTIVE then return end
-    taskscheduler.update(elapsedTime)
+    main_thread.update(elapsedTime)
     if PAUSED then return end
     for physics_object, _ in pairs(physics_objects) do
         physics_object:update(elapsedTime)
@@ -230,7 +234,13 @@ function love.update(elapsedTime)
 
     ray_start = Vector2.new(1000,1000)
     ray_dir = Vector2.new(love.mouse.getX(), love.mouse.getY())
+end)
 
+function love.update(elapsedTime)
+    if not ACTIVE then return end
+    for name, scheduler in pairs(taskscheduler.schedulers) do
+        scheduler.update(elapsedTime)
+    end
 end
 
 -- draw itself is actually a loop which acts upon any calls to draw i.e. love.graphics.circle
@@ -248,6 +258,7 @@ function love.draw()
     for p, _ in pairs(ProjectileList) do
         p:draw()
     end
+    --Interface.ROOT:Draw()
 
     local r,g,b,a = love.graphics.getColor()
     -- if geometry.CheckRayVsCircle(ray_start, ray_dir, Shapes.Circle.new(player.center().x, player.center().y, player.hitbox_radius)) then
@@ -279,3 +290,12 @@ function love.draw()
     end
 
 end
+
+-- delayedExecute(10, function()
+--     local test = require "test"
+--     test.oldDraw = love.draw
+--     --local oldUp, oldDr = love.update, love.draw
+--     --love.update = test.update
+--     main_thread.Paused = true
+--     love.draw = test.draw
+-- end)
