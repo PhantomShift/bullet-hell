@@ -11,7 +11,7 @@ function taskscheduler.new(name)
     local __time = tick()
     local scheduler = {
         Stepped = BindableEvent.new(),
-        Paused = false,
+        Paused = true,
         Name = name
     }
     local thread = coroutine.create(function()
