@@ -1,6 +1,6 @@
 love.window.setMode(350, 800, {vsync=false})
 love.window.setTitle(":MatsuriDerp:")
-local a
+
 local player = require "player"
 local enemy = require "enemy"
 local Vector2 = require "Vector2"
@@ -13,6 +13,7 @@ local BindableEvent = require "BindableEvent"
 local path = require "path"
 local Interface = require "Interface"
 local UserInput = require "UserInput"
+local statemanager = require "statemanager"
 
 table.unpack = unpack
 
@@ -238,9 +239,10 @@ end)
 
 function love.update(elapsedTime)
     if not ACTIVE then return end
-    for name, scheduler in pairs(taskscheduler.schedulers) do
-        scheduler.update(elapsedTime)
-    end
+    --for name, scheduler in pairs(taskscheduler.schedulers) do
+    --    scheduler.update(elapsedTime)
+    --end
+    main_thread.update(elapsedTime)
 end
 
 -- draw itself is actually a loop which acts upon any calls to draw i.e. love.graphics.circle
@@ -291,11 +293,10 @@ function love.draw()
 
 end
 
+local main_state = statemanager.CreateState("Main", love.update, love.draw, main_thread)
+statemanager.SetState("Main")
+
 -- delayedExecute(10, function()
 --     local test = require "test"
---     test.oldDraw = love.draw
---     --local oldUp, oldDr = love.update, love.draw
---     --love.update = test.update
---     main_thread.Paused = true
---     love.draw = test.draw
+--     statemanager.SetState("test")
 -- end)

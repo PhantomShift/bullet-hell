@@ -1,5 +1,6 @@
 local Instance = require "Instance"
 local taskscheduler = require "taskscheduler"
+local statemanager = require "statemanager"
 local ROOT = Instance.new("Interface")
 ROOT.FORCEDRAW = true
 ROOT:SetSize(1, 1, 0, 0)
@@ -16,9 +17,9 @@ function test.draw()
 end
 
 test_thread.delay(10, function()
-    test_thread.Paused = true
-    taskscheduler.schedulers.main.Paused = false
-    love.draw = test.oldDraw
+    statemanager.SetState("Main")
 end)
+
+test.state = statemanager.CreateState("test", function() test_thread.update() end, test.draw, test_thread)
 
 return test
