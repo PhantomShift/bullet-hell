@@ -48,7 +48,7 @@ function love.load()
     PAUSED = false
     function togglePause()
         PAUSED = not PAUSED
-        taskscheduler.Paused = PAUSED
+        main_thread.Paused = PAUSED
     end
     ACTIVE = true
     local regular_font = love.graphics.getFont()
