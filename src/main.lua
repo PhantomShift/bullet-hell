@@ -35,15 +35,25 @@ GameWon:Connect(function()
     end
 end)
 
+function clear_list(list)
+    for key, _ in pairs(list) do
+        list[key] = nil
+    end
+end
+
 math.randomseed(os.time())
 -- initialization
+local initial_load = true
 function love.load()
+    clear_list(projectile.ProjectileList)
     ProjectileList = projectile.ProjectileList
     physics_objects = {}
     GRAVITY = -9.81 * 10
     -- grab window size
     Y_MAX = love.graphics.getHeight()
     X_MAX = love.graphics.getWidth()
+
+    -- player.pos = Vector2.new(love.graphics.getWidth()/2, love.graphics.getHeight()/2)
     
     PAUSED = false
     function togglePause()
@@ -55,17 +65,34 @@ function love.load()
     GAME_OVER = love.graphics.newText(regular_font, "GAME OVER!")
     PAUSED_TEXT = love.graphics.newText(regular_font, "PAUSED")
 
-    function clear_list(list)
-        for key, _ in pairs(list) do
-            list[key] = nil
-        end
-    end
-
+    enemy:clearEnemyList()
     enemy_list = enemy.__enemy_list
+    -- Temporary AI lol
+    function aimedFireLaser(currentPos, targetPos, delay, flags)
+        local info = {
+            draw = function(self)
+                local r,g,b,a = love.graphics.getColor()
+                love.graphics.setColor(0, 0, 1, delay - self.time)
+                local c = currentPos
+                local aim = c + (targetPos - c).Unit * 10000
+                love.graphics.line(c.x, c.y, aim.x, aim.y)
+                love.graphics.setColor(r,g,b,a)
+            end,
+            update = function(self, elapsedTime) self.time = self.time + elapsedTime end,
+            hits = function() end,
+            time = 0
+        }
+        ProjectileList[info] = true
+        delayedExecute(delay, function()
+            ProjectileList[info] = nil
+            projectile.laser(currentPos, targetPos - currentPos, flags)
+        end)
+    end
     random_enemy = enemy:new{
         pos = Vector2.new(love.graphics.getWidth()/2, 50),
         direction = 1,
         boundaries = {min = Vector2.new(30, 20), max = Vector2.new(love.graphics.getWidth()-60, 170)},
+        accumulated_time = 0,
         update = function(self, elapsedTime)
             local resolver = self.resolver
             if not resolver then
@@ -80,11 +107,20 @@ function love.load()
             -- if self.pos.x < 0 or self.pos.x + self.size.x > X_MAX then
             --     self.direction = self.direction * -1
             -- end
+            self.accumulated_time = self.accumulated_time + elapsedTime
+            if self.accumulated_time > 2.5 then
+                self.mode = (self.mode + 1) % 12
+                local target = player.center()
+                aimedFireLaser(self:center(), target, 0.5, {lifetime = 1})
+                self.accumulated_time = 0
+            end
+
             if self.health <= 0 then
                 GameWon:Fire()
             end
         end,
         step = function(self)
+            if not enemy.__enemy_list[self] then return end
             if self.mode == 1 and math.random(5) > 3 then
                 local p = self:center()
                 projectile.gravityBoundCircle(p.x, p.y)
@@ -93,10 +129,11 @@ function love.load()
                 projectile.weakHomingCircle(p, Vector2.new(0, 50))
             elseif self.mode == 5 and math.random(50) == 50 then
                 local target = player.center()
-                aimedFireLaser(target, 1, {reflections = 4})
+                aimedFireLaser(self:center(), target, 1, {reflections = 4})
             elseif self.mode == 7 and math.random(5) > 3 then
                 for b = 1, 3 do
                     delayedExecute(b, function()
+                        if not enemy.__enemy_list[self] then return end
                         for i = 0, 360, 40 do
                             projectile.spiralCircle(self:center(), 1.5, 100, math.rad(i), 10)
                         end
@@ -107,6 +144,7 @@ function love.load()
             elseif self.mode == 10 then
                 for b = 0, 3 do
                     delayedExecute(b, function()
+                        if not enemy.__enemy_list[self] then return end
                         for i = 0, 360, 60 do
                             projectile.delayedChase(self:center(), player, 3, Vector2.fromAngle(i, 150, true), 500, 11.5)
                         end
@@ -119,45 +157,18 @@ function love.load()
         max_health = 1000,
         mode = 6
     }
-    function aimedFireLaser(targetPos, delay, reflections)
-        local info = {
-            draw = function(self)
-                local r,g,b,a = love.graphics.getColor()
-                love.graphics.setColor(0, 0, 1, delay - self.time)
-                local c = random_enemy:center()
-                local aim = c + (targetPos - c).Unit * 10000
-                love.graphics.line(c.x, c.y, aim.x, aim.y)
-                love.graphics.setColor(r,g,b,a)
-            end,
-            update = function(self, elapsedTime) self.time = self.time + elapsedTime end,
-            hits = function() end,
-            time = 0
-        }
-        ProjectileList[info] = true
-        delayedExecute(delay, function()
-            ProjectileList[info] = nil
-            local s = random_enemy:center()
-            projectile.laser(s, targetPos - s, reflections)
-        end)
-    end
-    
-    local function some_loop() delayedExecute(2.5, function() random_enemy.mode = (random_enemy.mode + 1) % 12; some_loop() end) end
-    some_loop()
-    local function execution_loop()
-        delayedExecute(2.5, function()
-            local target = player.center()
-            aimedFireLaser(target, 0.5)
-            execution_loop()
-        end)
-    end
-    execution_loop()
 
     keyboard = love.keyboard
     love.graphics.setBackgroundColor(1,1,1)
 
     love.audio.setVolume(0.25)
-    love.audio.play(love.audio.newSource("assets/fck It..mp3", "static"))
-    
+
+    if initial_load then
+        music = love.audio.newSource("assets/fck It..mp3", "static")
+        music:setLooping(true)
+        music:play()
+    end
+    initial_load = false
 end
 
 function love.keypressed(key)
@@ -166,7 +177,8 @@ function love.keypressed(key)
     elseif key == "x" then
         togglePause()
     elseif key == "r" and keyboard.isDown("lctrl") then
-        love.event.quit("restart")
+--         love.event.quit("restart")
+        love.load()
     end
 end
 
@@ -235,6 +247,8 @@ main_thread.Stepped:Connect(function(elapsedTime)
 
     ray_start = Vector2.new(1000,1000)
     ray_dir = Vector2.new(love.mouse.getX(), love.mouse.getY())
+
+    love.window.setTitle(tostring(1 / elapsedTime))
 end)
 
 function love.update(elapsedTime)
@@ -242,6 +256,7 @@ function love.update(elapsedTime)
     --for name, scheduler in pairs(taskscheduler.schedulers) do
     --    scheduler.update(elapsedTime)
     --end
+
     main_thread.update(elapsedTime)
 end
 

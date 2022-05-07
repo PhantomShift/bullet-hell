@@ -14,6 +14,12 @@ local enemy = {
         pos = Vector2.new(love.graphics.getWidth()/2, love.graphics.getHeight()/2),
         size = Vector2.new(placeholder:getWidth()/2, placeholder:getHeight()/2),
     },
+    clearEnemyList = function(self)
+        for e, t in pairs(self.__enemy_list) do
+            e.__onStepped:Disconnect()
+            self.__enemy_list[e] = nil
+        end
+    end,
     center = function(self)
         return self.pos + self.size / 2
     end,
@@ -53,7 +59,7 @@ function enemy:new(t)
     assert(t.pos, "enemy:new missing arguments")
     self.__index = self
     if t.step then
-        main_thread.Stepped:Connect(function() t:step() end)
+        t.__onStepped = main_thread.Stepped:Connect(function() t:step() end)
     end
     setmetatable(t, self)
     t.size = Vector2.new(t.image:getWidth()/2, t.image:getHeight()/2)
